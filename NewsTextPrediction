@@ -1,0 +1,43 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+"""
+=========================================================
+Naive Bayesian Prediction of fetch_20newsgroups
+=========================================================
+This example uses ‘fetch_20newsgroups’ dataset from internet, Then, we initialize a naive bayesian model MultinomianNB to predict the news text data,
+This example first transforms the text into eigenvectors, then uses the naive Bayesian model to estimate the parameters from the training data,
+and finally uses these probabilistic parameters to classify the test news samples that are similarly transformed into eigenvectors
+
+"""
+print(__doc__)
+
+# Author: HangJie
+
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.cross_validation import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import classification_report
+
+news = fetch_20newsgroups(subset='all')
+# print(len(news.data))
+# print(news.data[0])
+
+# Randomly sample 25% of the data for testing, and the remaining 75% for training sets
+X_train, X_test, y_train, y_test = train_test_split(news.data,news.target,test_size=0.25,random_state=33)
+
+# Convert a collection of text documents to a matrix of token counts
+vec = CountVectorizer()
+X_train = vec.fit_transform(X_train)
+X_text = vec.transform(X_test)
+
+# Initializing and Training MultinomialNB Model
+mnb = MultinomialNB()
+mnb.fit(X_train,y_train)
+y_predict = mnb.predict(X_text)
+print(y_predict[:5])
+
+# The performance evaluation of Naive Bayesian classifier in news text data
+print('The accuracy of the Naive Bayesian classifier:',mnb.score(X_text,y_test))
+print(classification_report(y_test,y_predict,target_names=news.target_names))
